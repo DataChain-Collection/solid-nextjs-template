@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import BootstrapTemplate from '../../../markdown/docs/bootstrap-template.mdx';
 import ContactForm from '../../../markdown/docs/contact-form.mdx';
 import StyleGuide from '../../../markdown/docs/style-guide.mdx';
@@ -8,15 +9,35 @@ import TailwindComponent from '../../../markdown/docs/tailwind-component.mdx';
 import TailwindTemplate from '../../../markdown/docs/tailwind-template.mdx';
 
 const docs = [
-  { title: "Bootstrap Template", Component: BootstrapTemplate },
-  { title: "Contact Form", Component: ContactForm },
-  { title: "Style Guide", Component: StyleGuide },
-  { title: "Tailwind Component", Component: TailwindComponent },
-  { title: "Tailwind Template", Component: TailwindTemplate },
+  { title: "Bootstrap Template", Component: BootstrapTemplate, slug: "bootstrap-template" },
+  { title: "Contact Form", Component: ContactForm, slug: "contact-form" },
+  { title: "Style Guide", Component: StyleGuide, slug: "style-guide" },
+  { title: "Tailwind Component", Component: TailwindComponent, slug: "tailwind-component" },
+  { title: "Tailwind Template", Component: TailwindTemplate, slug: "tailwind-template" },
 ];
 
 export default function DocsPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [activeIdx, setActiveIdx] = useState(0);
+
+  // Get the active document from URL params
+  useEffect(() => {
+    const docParam = searchParams.get('doc');
+    if (docParam) {
+      const idx = docs.findIndex(doc => doc.slug === docParam);
+      if (idx !== -1) {
+        setActiveIdx(idx);
+      }
+    }
+  }, [searchParams]);
+
+  const handleDocChange = (idx: number) => {
+    setActiveIdx(idx);
+    const slug = docs[idx].slug;
+    router.push(`/docs?doc=${slug}`);
+  };
+
   const ActiveDoc = docs[activeIdx].Component;
 
   return (
@@ -31,7 +52,7 @@ export default function DocsPage() {
                   <li key={doc.title}>
                     <button
                       className={`w-full text-left px-2 py-1 rounded transition-colors ${activeIdx === idx ? 'bg-primary text-white' : 'hover:bg-primary/10'}`}
-                      onClick={() => setActiveIdx(idx)}
+                      onClick={() => handleDocChange(idx)}
                     >
                       {doc.title}
                     </button>
