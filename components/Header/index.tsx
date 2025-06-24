@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useChainId } from 'wagmi';
 
 import ThemeToggler from "./ThemeToggler";
 import menuData from "./menuData";
@@ -14,6 +15,8 @@ const Header = () => {
   const [stickyMenu, setStickyMenu] = useState(false);
 
   const pathUrl = usePathname();
+  const chainId = useChainId();
+  const wrongNetwork = chainId !== 14800;
 
   // Sticky menu
   const handleStickyMenu = () => {
@@ -156,12 +159,17 @@ const Header = () => {
             <ThemeToggler />
 
             <Link
-              href="https://github.com/DataChain-Collective"
+              href="https://github.com/DataChain-Collective/nutridao-frontend"
               className="text-regular font-medium text-waterloo hover:text-primary"
             >
               GitHub Repo 🌟
             </Link>
 
+            {wrongNetwork && (
+              <div className="text-red-600 text-sm font-semibold mr-2">
+                ⚠️ Please connect the wallet to the VANA Moksha Testnet network.
+              </div>
+            )}
             <ConnectButton />
           </div>
         </div>
